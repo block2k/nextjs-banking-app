@@ -3,19 +3,25 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { authFormSchema } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import CustomInput from "./CustomInput";
+import { useRouter } from "next/navigation";
 
-const AuthForm = ({ type }: { type: string }) => {
+const AuthForm = ({ type }: { type: "sign-in" | "sign-up" }) => {
+  const router = useRouter();
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const formSchema = authFormSchema(type);
 
   // 1. Define your form.
-  const form = useForm<z.infer<typeof authFormSchema>>({
-    resolver: zodResolver(authFormSchema),
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
@@ -23,11 +29,39 @@ const AuthForm = ({ type }: { type: string }) => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof authFormSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
+    setIsLoading(true);
+    try {
+      if (type === "sign-up") {
+        const userData = {
+          firstName: values.firstName,
+          lastName: values.lastName,
+          address: values.address,
+          state: values.state,
+          postalCode: values.postalCode,
+          dateOfBirth: values.dateOfBirth,
+          ssn: values.ssn,
+          email: values.email,
+          password: values.password,
+        };
+      }
+
+      if (type === "sign-in") {
+        // const response = await SignIn({ email: values.email, password: values.password });
+
+        // if (response) {
+        //   router.push("/");
+        // }
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
   }
+
   return (
     <section className="auth-form">
       <header className="flex flex-col gap-5 md:gap-8">
@@ -54,6 +88,80 @@ const AuthForm = ({ type }: { type: string }) => {
         <>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+              {type === "sign-up" && (
+                <>
+                  <div className="flex gap-4">
+                    <CustomInput
+                      id="firstName"
+                      control={form.control}
+                      name="firstName"
+                      label="First Name"
+                      placeholder="Enter your first name"
+                      type="text"
+                    />
+                    <CustomInput
+                      id="lastName"
+                      control={form.control}
+                      name="lastName"
+                      label="Last Name"
+                      placeholder="Enter your last name"
+                      type="text"
+                    />
+                  </div>
+                  <CustomInput
+                    id="address"
+                    control={form.control}
+                    name="address"
+                    label="Address"
+                    placeholder="Enter your address"
+                    type="text"
+                  />
+                  <CustomInput
+                    id="city"
+                    control={form.control}
+                    name="city"
+                    label="City"
+                    placeholder="Enter your city"
+                    type="text"
+                  />
+                  <div className="flex gap-4">
+                    <CustomInput
+                      id="state"
+                      control={form.control}
+                      name="state"
+                      label="State"
+                      placeholder="Select your state"
+                      type="text"
+                    />
+                    <CustomInput
+                      id="postalCode"
+                      control={form.control}
+                      name="postalCode"
+                      label="Postal Code"
+                      placeholder="e.g. 100001"
+                      type="text"
+                    />
+                  </div>
+                  <div className="flex gap-4">
+                    <CustomInput
+                      id="dateOfBirth"
+                      control={form.control}
+                      name="dateOfBirth"
+                      label="Date of Birth"
+                      placeholder="YYYY-MM-DD"
+                      type="text"
+                    />
+                    <CustomInput
+                      id="ssn"
+                      control={form.control}
+                      name="ssn"
+                      label="SSN"
+                      placeholder="Enter your SSN"
+                      type="text"
+                    />
+                  </div>
+                </>
+              )}
               <CustomInput
                 id="email"
                 control={form.control}
@@ -70,9 +178,25 @@ const AuthForm = ({ type }: { type: string }) => {
                 placeholder="Enter your password"
                 type="password"
               />
-              <Button type="submit">Submit</Button>
+              <div className="flex flex-col gap-4">
+                <Button type="submit" className="form-btn" disabled={isLoading}>
+                  {isLoading ? (
+                    <Loader2 size={20} className="animate-spin" />
+                  ) : type === "sign-in" ? (
+                    "Sign In"
+                  ) : (
+                    "Sign Up"
+                  )}
+                </Button>
+              </div>
             </form>
           </Form>
+          <footer className="flex justify-center gap-1">
+            <p>{type === "sign-in" ? `Don't have an account?` : `Already have an account?`}</p>
+            <Link href={type === "sign-in" ? "/sign-up" : "/sign-in"} className="text-blue-600">
+              {type === "sign-in" ? "Sign up" : "Sign in"}
+            </Link>
+          </footer>
         </>
       )}
     </section>

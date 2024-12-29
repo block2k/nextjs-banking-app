@@ -1,16 +1,17 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
+import { signIn, signUp } from "@/lib/actions/user.action";
 import { authFormSchema } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import CustomInput from "./CustomInput";
-import { useRouter } from "next/navigation";
 
 const AuthForm = ({ type }: { type: "sign-in" | "sign-up" }) => {
   const router = useRouter();
@@ -46,14 +47,17 @@ const AuthForm = ({ type }: { type: "sign-in" | "sign-up" }) => {
           email: values.email,
           password: values.password,
         };
+
+        const response = await signUp(userData);
+
+        setUser(response);
       }
 
       if (type === "sign-in") {
-        // const response = await SignIn({ email: values.email, password: values.password });
-
-        // if (response) {
-        //   router.push("/");
-        // }
+        const response = await signIn({ email: values.email, password: values.password });
+        if (response) {
+          router.push("/");
+        }
       }
     } catch (error) {
       console.error(error);

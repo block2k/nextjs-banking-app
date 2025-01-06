@@ -21,7 +21,7 @@ const PlaidLink = ({ user, variant }: PlaidLinkProps) => {
   );
 
   const config: PlaidLinkOptions = {
-    token: process.env.NEXT_PUBLIC_PLAID_PUBLIC_KEY!,
+    token: token,
     onSuccess,
   };
 

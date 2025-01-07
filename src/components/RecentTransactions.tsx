@@ -3,6 +3,7 @@ import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BankTabItem } from "./BankTabItem";
 import BankInfo from "./BankInfo";
+import TransactionsTable from "./TransactionsTable";
 
 const RecentTransactions = ({ accounts, transactions = [], appwriteItemId, page = 1 }: RecentTransactionsProps) => {
   return (
@@ -24,6 +25,7 @@ const RecentTransactions = ({ accounts, transactions = [], appwriteItemId, page 
         {accounts.map((account) => (
           <TabsContent key={account.id} value={account.appwriteItemId} className="space-y-4">
             <BankInfo account={account} type="full" appwriteItemId={account.appwriteItemId} />
+            <TransactionsTable transactions={transactions} />
           </TabsContent>
         ))}
       </Tabs>

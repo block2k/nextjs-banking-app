@@ -119,7 +119,7 @@ export async function createLinkToken(user: User) {
         client_user_id: user.$id,
       },
       client_name: `${user.firstName} ${user.lastName}`,
-      products: ["auth"] as Products[],
+      products: ["auth", 'transactions'] as Products[],
       language: "en",
       country_codes: ["US"] as CountryCode[],
     };
@@ -217,22 +217,23 @@ export async function exchangePublicToken({ publicToken, user }: exchangePublicT
 export const getBanks = async ({ userId }: getBanksProps) => {
   try {
     const { database } = await createAdminClient();
+
     const banks = await database.listDocuments(DATABASE_ID!, BANK_COLLECTION_ID!, [Query.equal("userId", [userId])]);
-    console.log("🚀 ~ getBanks ~ banks:", banks);
 
     return parseStringify(banks.documents);
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 };
 
 export const getBank = async ({ documentId }: getBankProps) => {
   try {
     const { database } = await createAdminClient();
+
     const bank = await database.listDocuments(DATABASE_ID!, BANK_COLLECTION_ID!, [Query.equal("$id", [documentId])]);
 
-    return parseStringify(bank.documents);
+    return parseStringify(bank.documents[0]);
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 };
